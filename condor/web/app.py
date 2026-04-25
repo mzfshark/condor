@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -39,6 +40,20 @@ def create_app() -> FastAPI:
     app.include_router(ws.router, prefix="/api/v1")
     app.include_router(agents.router, prefix="/api/v1")
     app.include_router(routines.router, prefix="/api/v1")
+
+    @app.get("/health")
+    async def health():
+        from config_manager import get_config_manager
+
+        config = get_config_manager()
+        default_server = config.get_default_server()
+        return JSONResponse(
+            {
+                "status": "ok",
+                "default_server": default_server,
+                "configured_servers": list(config.list_servers().keys()),
+            }
+        )
 
     # ── Serve built frontend (production) ──
     dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
