@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import os
 import secrets
 import time
 from typing import Optional
@@ -79,6 +80,20 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(_bearer_scheme),
 ) -> WebUser:
     """FastAPI dependency that extracts and validates the JWT."""
+    static_token = (os.getenv("CONDOR_TOKEN") or os.getenv("CONDOR_API_TOKEN") or "").strip()
+    if static_token and credentials.credentials == static_token:
+        cm = get_config_manager()
+        admin_id = cm.admin_id or 0
+        role = cm.get_user_role(admin_id)
+        if role != UserRole.ADMIN:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        return WebUser(
+            id=admin_id,
+            username="condor_token",
+            first_name="Condor",
+            role=role.value,
+        )
+
     payload = decode_jwt(credentials.credentials)
     if payload is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
