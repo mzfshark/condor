@@ -1,8 +1,16 @@
 from __future__ import annotations
 
+import os
 from typing import Any, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+def _default_hbot_image() -> str:
+    value = (os.getenv("HBOT_IMAGE") or "").strip()
+    if value:
+        return value
+    return "hummingbot/hummingbot:development"
 
 
 # ── Auth ──
@@ -240,7 +248,7 @@ class DeployBotRequest(BaseModel):
     bot_name: str
     controllers_config: list[str]
     account_name: str = "master_account"
-    image: str = "hummingbot/hummingbot:latest"
+    image: str = Field(default_factory=_default_hbot_image)
     max_global_drawdown_quote: float | None = None
     max_controller_drawdown_quote: float | None = None
 

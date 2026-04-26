@@ -4,6 +4,7 @@ Main MCP server for Hummingbot API integration
 
 import asyncio
 import logging
+import os
 import sys
 from typing import Any, Literal
 
@@ -49,6 +50,9 @@ from mcp_servers.hummingbot_api.tools.backtesting import (
     manage_backtest_tasks as manage_backtest_tasks_impl,
     run_backtest as run_backtest_impl,
 )
+
+# Default Hummingbot Trading Bot image tag for deployments
+DEFAULT_HBOT_IMAGE = os.getenv("HBOT_IMAGE", "hummingbot/hummingbot:development")
 
 # Configure root logger
 logging.basicConfig(
@@ -550,7 +554,7 @@ async def manage_bots(
         account_name: str | None = "master_account",
         max_global_drawdown_quote: float | None = None,
         max_controller_drawdown_quote: float | None = None,
-        image: str = "hummingbot/hummingbot:latest",
+        image: str = DEFAULT_HBOT_IMAGE,
         log_type: Literal["error", "general", "all"] = "all",
         limit: int = 50,
         search_term: str | None = None,
@@ -582,7 +586,7 @@ async def manage_bots(
         account_name: Account name for deployment (default: master_account).
         max_global_drawdown_quote: Maximum global drawdown in quote currency (deploy only).
         max_controller_drawdown_quote: Maximum per-controller drawdown in quote currency (deploy only).
-        image: Docker image for deployment (default: "hummingbot/hummingbot:latest").
+        image: Docker image for deployment (default: HBOT_IMAGE or "hummingbot/hummingbot:development").
         log_type: Type of logs to retrieve for 'logs' action ('error', 'general', 'all').
         limit: Maximum log entries for 'logs' action (default: 50, max: 1000).
         search_term: Search term to filter logs by message content (logs only).

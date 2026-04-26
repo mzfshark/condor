@@ -4,7 +4,11 @@ Controller management operations business logic.
 This module provides the core business logic for managing controllers and their
 configurations, including exploration, modification, and bot deployment.
 """
+import os
 from typing import Any, Literal
+
+# Default Hummingbot Trading Bot image tag for deployments
+DEFAULT_HBOT_IMAGE = os.getenv("HBOT_IMAGE", "hummingbot/hummingbot:development")
 
 # Internal/auto-managed fields that should be skipped during schema validation
 _SKIP_FIELDS = {"id", "controller_name", "controller_type", "candles_config", "initial_positions"}
@@ -423,7 +427,7 @@ async def deploy_bot(
     account_name: str | None = "master_account",
     max_global_drawdown_quote: float | None = None,
     max_controller_drawdown_quote: float | None = None,
-    image: str = "hummingbot/hummingbot:latest",
+    image: str = DEFAULT_HBOT_IMAGE,
 ) -> dict[str, Any]:
     """
     Deploy a bot with specified controller configurations.
