@@ -32,4 +32,4 @@ RUN uv run python -c "import kaleido; kaleido.get_chrome_sync()" || true
 
 COPY . .
 VOLUME ["/app/data"]
-CMD ["uv", "run", "python", "main.py"]
+CMD ["/app/.venv/bin/python", "main.py"]
